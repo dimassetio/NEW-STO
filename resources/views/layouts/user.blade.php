@@ -56,7 +56,9 @@
       <div class="container container-fluid">
         <div class="d-flex flex-column align-items-start">
           <div class="d-flex align-items-center">
-            <i class="fas fa-warehouse me-2"></i> Scan STO
+            <a href="{{ route('sto.index') }}" class="text-white">
+              <i class="fas fa-warehouse me-2"></i> Scan STO
+            </a>
           </div>
           @if (isset($inventory))
             <p class="colom mt-1" style="font-size: 17px; margin-bottom: -1px; color:rgb(255, 255, 255);">
@@ -155,6 +157,7 @@
       document.getElementById('loader').style.display = 'none';
     });
   </script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   @yield('script')
   {{-- reload with ajax  --}}
 

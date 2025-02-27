@@ -7,22 +7,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class Inventory extends Model
 {
-    use HasFactory;
+  use HasFactory;
 
-    protected $table = 'inventory'; // Specify the table name
+  protected $table = 'inventory';
 
-    protected $fillable = [
-        'inventory_id',
-        'part_name',
-        'part_number',
-        'type_package',
-        'qty_package',
-        'project',
-        'customer',
-        'detail_lokasi',
-        'satuan',
-        'stok_awal',
-        'plant',
-        'status_product', // Add this line
-    ];
+  protected $fillable = [
+    'inventory_id',
+    'part_name',
+    'part_number',
+    'type_package',
+    'qty_package',
+    'project',
+    'customer',
+    'detail_lokasi',
+    'satuan',
+    'stok_awal',
+    'plant',
+    'category',
+    'status_product',
+  ];
 }

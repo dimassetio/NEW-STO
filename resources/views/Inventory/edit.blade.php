@@ -93,9 +93,9 @@
             <select name="customer" class="form-control @error('customer') is-invalid @enderror" id="customer" required>
               <option value="">Select Customer</option>
               @foreach ($customers as $customer)
-                <option value="{{ $customer->name }}"
-                  {{ old('customer', $inventory->customer) == $customer->name ? 'selected' : '' }}>
-                  {{ $customer->name }}
+                <option value="{{ $customer->username }}"
+                  {{ old('customer', $inventory->customer) == $customer->username ? 'selected' : '' }}>
+                  {{ $customer->username }}
                 </option>
               @endforeach
             </select>
@@ -142,24 +142,24 @@
             @enderror
           </div>
 
-          <div class="col-md-6">
-            <label for="status_product" class="form-label">Status Product</label>
-            <select name="status_product" class="form-control @error('status_product') is-invalid @enderror"
-              id="status_product" required>
-              <option value="">Select Status Product</option>
-              <option value="FG" {{ old('status_product', $inventory->status_product) == 'FG' ? 'selected' : '' }}>
-                FG</option>
-              <option value="WIP" {{ old('status_product', $inventory->status_product) == 'WIP' ? 'selected' : '' }}>
-                WIP</option>
-              <option value="CHILPART"
-                {{ old('status_product', $inventory->status_product) == 'CHILPART' ? 'selected' : '' }}>CHILPART</option>
-              <option value="RAW MATERIAL"
-                {{ old('status_product', $inventory->status_product) == 'RAW MATERIAL' ? 'selected' : '' }}>RAW MATERIAL
-              </option>
-            </select>
-            @error('status_product')
-              <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="category" class="form-label">Category Product</label>
+              <select class="form-control" id="category" name="category" required>
+                @foreach ($categories as $category)
+                  <option value="{{ $category }}"
+                    {{ old($category, $inventory->category) == $category ? 'selected' : '' }}>
+                    {{ $category }}
+                  </option>
+                @endforeach
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="status_product" class="form-label">Status Product</label>
+              <select class="form-control" id="status_product" name="status_product" required>
+                <option value="">Select Status Product</option>
+              </select>
+            </div>
           </div>
 
           <div class="col-12">
@@ -169,4 +169,43 @@
       </div>
     </div>
   </section>
+@endsection
+
+@section('script')
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      function loadStatusProduct(category, selectedStatus = '') {
+        if (category) {
+          $.ajax({
+            url: "{{ url('/get-status') }}/" + encodeURIComponent(category),
+            type: 'GET',
+            success: function(data) {
+              $('#status_product').empty(); // Clear previous options
+              $('#status_product').append('<option value="">Select Status Product</option>'); // Default option
+
+              $.each(data, function(key, value) {
+                var selected = (value === selectedStatus) ? 'selected' : '';
+                $('#status_product').append('<option value="' + value + '" ' + selected + '>' + value +
+                  '</option>');
+              });
+            }
+          });
+        } else {
+          $('#status_product').empty().append('<option value="">Select Status Product</option>');
+        }
+      }
+
+      // Load status options on page load if a category is already selected
+      var initialCategory = $('#category').val();
+      var initialStatus = "{{ old('status_product', $inventory->status_product) }}";
+      loadStatusProduct(initialCategory, initialStatus);
+
+      // Handle category change
+      $('#category').change(function() {
+        var category = $(this).val();
+        loadStatusProduct(category);
+      });
+    });
+  </script>
 @endsection

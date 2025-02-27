@@ -35,33 +35,36 @@
             <div class="mb-3 row">
               <label for="inventory-code" class="col-md-3 col-form-label">Inventory Code</label>
               <div class="col-md-9">
+                <input required hidden type="text" id="inventory-code" name="id_inventory" class="form-control"
+                  value="{{ old('id', $inventory->id ?? '') }}">
                 <input required type="text" id="inventory-code" name="inventory_id" class="form-control"
                   placeholder="Enter inventory code" value="{{ old('inventory_id', $inventory->inventory_id ?? '') }}">
+              </div>
+            </div>
+
+            <!-- Inventory Category -->
+            <div class="mb-3 row">
+              <label for="category" class="col-md-3 col-form-label">Category</label>
+              <div class="col-md-9">
+                <select class="form-control" id="category" name="category" required>
+                  @foreach ($categories as $category)
+                    <option value="{{ $category }}"
+                      {{ old($category, $inventory->category) == $category ? 'selected' : '' }}>
+                      {{ $category }}
+                    </option>
+                  @endforeach
+                </select>
               </div>
             </div>
 
             <!-- Status (Radio Buttons) -->
             <div class="mb-3 row">
               <label class="col-md-3 col-form-label">Status</label>
-              <div class="col-md-9 d-flex align-items-center">
+              <div class="col-md-9 d-flex align-items-center status-container">
                 @php
                   $status = old('status', $inventory->status_product ?? '');
                 @endphp
-                <div class="form-check me-3">
-                  <input class="form-check-input" type="radio" name="status" id="ng" value="NG"
-                    {{ $status == 'NG' ? 'checked' : '' }}>
-                  <label class="form-check-label" for="ng">NG</label>
-                </div>
-                <div class="form-check me-3">
-                  <input class="form-check-input" type="radio" name="status" id="wip" value="WIP"
-                    {{ $status == 'WIP' ? 'checked' : '' }}>
-                  <label class="form-check-label" for="wip">WIP</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="status" id="fg" value="FG"
-                    {{ $status == 'FG' ? 'checked' : '' }}>
-                  <label class="form-check-label" for="fg">FG</label>
-                </div>
+                <!-- Initial status options will be populated by AJAX -->
               </div>
             </div>
 
@@ -153,6 +156,43 @@
 @endsection
 
 @section('script')
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <script>
+    $(document).ready(function() {
+      $('#category').on('change', function() {
+        var category = $(this).val();
+        var initialStatus = "{{ old('status', $inventory->status_product) }}";
+        $.ajax({
+          url: "{{ url('/get-status') }}/" + encodeURIComponent(category),
+          type: 'GET',
+          success: function(response) {
+            var statusContainer = $('.status-container');
+            statusContainer.empty(); // Clear previous options
+
+            if (response.length > 0) {
+              response.forEach(function(status) {
+                var checked = (status === initialStatus) ? 'checked' : '';
+                var radioInput = `
+                                <div class="form-check me-3">
+                                    <input class="form-check-input" type="radio" name="status" id="${status}" value="${status}" ${checked}>
+                                    <label class="form-check-label" for="${status}">${status}</label>
+                                </div>
+                            `;
+                statusContainer.append(radioInput);
+              });
+            } else {
+              statusContainer.append('<p>No status options available</p>');
+            }
+          }
+        });
+      });
+
+      // Trigger change event to load initial status when the page loads
+      $('#category').trigger('change');
+    });
+  </script>
+
   <script>
     document.addEventListener("DOMContentLoaded", function() {
       function calculateTotals() {
@@ -166,7 +206,7 @@
         let total = qtyPerBox * qtyBox;
         let grandTotal = Total2 + total;
 
-        // Update the input fields
+        // Update the input fields 
         document.getElementById("total_2").value = Total2;
         document.getElementById("total").value = total;
         document.getElementById("grand_total").value = grandTotal;

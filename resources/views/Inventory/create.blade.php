@@ -65,8 +65,9 @@
               <select class="form-control" id="customer" name="customer" required>
                 <option value="">Select Customer</option>
                 @foreach ($customers as $customer)
-                  <option value="{{ $customer->name }}" {{ old('customer') == $customer->name ? 'selected' : '' }}>
-                    {{ $customer->name }}
+                  <option value="{{ $customer->username }}"
+                    {{ old('customer') == $customer->username ? 'selected' : '' }}>
+                    {{ $customer->username }}
                   </option>
                 @endforeach
               </select>
@@ -97,15 +98,23 @@
               <label for="plant" class="form-label">Plant</label>
               <input type="text" class="form-control" id="plant" name="plant" value="{{ old('plant') }}">
             </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="category" class="form-label">Status Product</label>
+              <select class="form-control" id="category" name="category" required>
+                @foreach ($categories as $category)
+                  <option value="{{ $category }}" {{ old($category) == $category ? 'selected' : '' }}>
+                    {{ $category }}
+                  </option>
+                @endforeach
+              </select>
+            </div>
             <div class="col-md-6 mb-3">
               <label for="status_product" class="form-label">Status Product</label>
               <select class="form-control" id="status_product" name="status_product" required>
                 <option value="">Select Status Product</option>
-                <option value="FG" {{ old('status_product') == 'FG' ? 'selected' : '' }}>FG</option>
-                <option value="WIP" {{ old('status_product') == 'WIP' ? 'selected' : '' }}>WIP</option>
-                <option value="CHILPART" {{ old('status_product') == 'CHILPART' ? 'selected' : '' }}>CHILPART</option>
-                <option value="RAW MATERIAL" {{ old('status_product') == 'RAW MATERIAL' ? 'selected' : '' }}>RAW
-                  MATERIAL</option>
               </select>
             </div>
           </div>
@@ -117,4 +126,44 @@
       </div>
     </div>
   </section>
+@endsection
+
+
+@section('script')
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      function loadStatusProduct(category, selectedStatus = '') {
+        if (category) {
+          $.ajax({
+            url: "{{ url('/get-status') }}/" + encodeURIComponent(category),
+            type: 'GET',
+            success: function(data) {
+              $('#status_product').empty(); // Clear previous options
+              $('#status_product').append('<option value="">Select Status Product</option>'); // Default option
+
+              $.each(data, function(key, value) {
+                var selected = (value === selectedStatus) ? 'selected' : '';
+                $('#status_product').append('<option value="' + value + '" ' + selected + '>' + value +
+                  '</option>');
+              });
+            }
+          });
+        } else {
+          $('#status_product').empty().append('<option value="">Select Status Product</option>');
+        }
+      }
+
+      // Load status options on page load if a category is already selected
+      var initialCategory = $('#category').val();
+
+      loadStatusProduct(initialCategory);
+
+      // Handle category change
+      $('#category').change(function() {
+        var category = $(this).val();
+        loadStatusProduct(category);
+      });
+    });
+  </script>
 @endsection

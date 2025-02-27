@@ -53,8 +53,10 @@ Route::post('/users/{user}/update-password', [UserController::class, 'updatePass
 
 Route::middleware('auth')->group(function () {
   Route::get('/sto', [STOController::class, 'index'])->name('sto.index');
+  Route::get('/sto/{id}', [STOController::class, 'show'])->name('sto.show');
   Route::post('/sto-scan', [STOController::class, 'scan'])->name('sto.scan');
   Route::get('/sto-form/{inventory}', [STOController::class, 'form'])->name('sto.form');
+  Route::post('/sto-form/store/new', [STOController::class, 'storeNew'])->name('sto.storeNew');
   Route::post('/sto-form/{inventory}/store', [STOController::class, 'store'])->name('sto.store');
   Route::get('/scan-sto', [InventoryController::class, 'showForm'])->name('scan-sto');
 });
@@ -76,9 +78,11 @@ Route::post('/inventory/change_status/{id}', [InventoryController::class, 'chang
 Route::post('inventory/{id}/change-status', [InventoryController::class, 'changeStatus'])->name('inventory.changeStatus');
 Route::post('/inventory', [InventoryController::class, 'store'])->name('inventory.store');
 Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
+Route::get('/inventory-data', [InventoryController::class, 'data'])->name('inventory.data');
 Route::post('/inventory/{id}/change-status', [InventoryController::class, 'changeStatus'])->name('inventory.changeStatus');
 Route::get('/inventory/downloadPdf', [InventoryController::class, 'downloadPdf'])->name('inventory.downloadPdf');
 Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+Route::get('/get-status/{category}', [InventoryController::class, 'getStatus'])->name('getStatus');
 
 Route::get('/daily-stok', [DailyController::class, 'index'])->name('daily.index');
 Route::get('/daily-stok/create', [DailyController::class, 'create'])->name('daily.create');

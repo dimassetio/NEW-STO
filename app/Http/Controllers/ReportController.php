@@ -42,7 +42,7 @@ class ReportController extends Controller
       new SvgImageBackEnd()
     );
     $writer = new Writer($renderer);
-    $qrCodeSvg = $writer->writeString($report->inventory_id);
+    $qrCodeSvg = $writer->writeString($report->inventory_id ?? '-');
 
     // Convert SVG to Base64
     $qrCodeBase64 = 'data:image/svg+xml;base64,' . base64_encode($qrCodeSvg);
